@@ -1,0 +1,107 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>质量检验 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>🏭 MES</h2>
+        <p>制造执行系统</p>
+      </div>
+      <ul class="nav-menu">
+        <li><a th:href="@{/}">📊 仪表盘</a></li>
+        <li><a th:href="@{/workorders}">📋 工单管理</a></li>
+        <li><a th:href="@{/schedule}">📅 生产排程</a></li>
+        <li><a th:href="@{/quality}" class="active">✅ 质量检验</a></li>
+        <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+        <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>✅ 质量检验</h1>
+        <div class="user-info"><span>👤 admin</span></div>
+      </header>
+      <div class="content">
+        <div class="stats-grid">
+          <div class="stat-card stat-purple">
+            <div class="stat-value" th:text="${passRate} + '%'">0%</div>
+            <div class="stat-label">合格率</div>
+          </div>
+          <div class="stat-card stat-blue">
+            <div class="stat-value" th:text="${totalInspections}">0</div>
+            <div class="stat-label">检验总数</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="filter-group">
+            <a
+              th:href="@{/quality}"
+              class="btn"
+              th:classappend="${currentResult == null} ? 'btn-primary' : ''"
+              >全部</a
+            >
+            <a
+              th:each="r : ${results}"
+              th:href="@{/quality(result=${r})}"
+              class="btn"
+              th:classappend="${currentResult == r} ? 'btn-primary' : ''"
+              th:text="${r}"
+            ></a>
+          </div>
+          <a th:href="@{/quality/create}" class="btn btn-success">+ 新建检验</a>
+        </div>
+
+        <div
+          th:if="${message}"
+          class="alert alert-success"
+          th:text="${message}"
+        ></div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>工单ID</th>
+              <th>检验员</th>
+              <th>结果</th>
+              <th>缺陷数</th>
+              <th>缺陷描述</th>
+              <th>检验时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="qi : ${inspections}">
+              <td th:text="${qi.id}"></td>
+              <td th:text="${qi.orderId}"></td>
+              <td th:text="${qi.inspector}"></td>
+              <td>
+                <span
+                  class="badge"
+                  th:classappend="${qi.result.name() == 'PASS'} ? 'badge-green' : (${qi.result.name() == 'FAIL'} ? 'badge-red' : 'badge-yellow')"
+                  th:text="${qi.result}"
+                ></span>
+              </td>
+              <td th:text="${qi.defectCount}"></td>
+              <td th:text="${qi.defectDescription} ?: '-'"></td>
+              <td
+                th:text="${#temporals.format(qi.inspectionTime, 'yyyy-MM-dd HH:mm')}"
+              ></td>
+              <td>
+                <a th:href="@{/quality/{id}(id=${qi.id})}" class="btn btn-sm"
+                  >查看</a
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

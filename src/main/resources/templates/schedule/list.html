@@ -1,0 +1,152 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生产排程 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>🏭 MES</h2>
+        <p>制造执行系统</p>
+      </div>
+      <ul class="nav-menu">
+        <li><a th:href="@{/}">📊 仪表盘</a></li>
+        <li><a th:href="@{/workorders}">📋 工单管理</a></li>
+        <li><a th:href="@{/schedule}" class="active">📅 生产排程</a></li>
+        <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+        <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+        <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>📅 生产排程</h1>
+        <div class="user-info"><span>👤 admin</span></div>
+      </header>
+      <div class="content">
+        <div class="toolbar">
+          <div class="filter-group">
+            <a
+              th:href="@{/schedule}"
+              class="btn"
+              th:classappend="${currentStatus == null} ? 'btn-primary' : ''"
+              >全部</a
+            >
+            <a
+              th:each="s : ${statuses}"
+              th:href="@{/schedule(status=${s})}"
+              class="btn"
+              th:classappend="${currentStatus == s} ? 'btn-primary' : ''"
+              th:text="${s}"
+            ></a>
+          </div>
+        </div>
+
+        <div
+          th:if="${message}"
+          class="alert alert-success"
+          th:text="${message}"
+        ></div>
+
+        <div class="schedule-timeline">
+          <div th:each="schedule : ${schedules}" class="schedule-item">
+            <div class="schedule-time">
+              <span
+                th:text="${#temporals.format(schedule.startTime, 'MM-dd HH:mm')}"
+              ></span>
+              <span> ~ </span>
+              <span
+                th:text="${#temporals.format(schedule.endTime, 'MM-dd HH:mm')}"
+              ></span>
+            </div>
+            <div class="schedule-content">
+              <div class="schedule-title">
+                <a
+                  th:href="@{/schedule/{id}(id=${schedule.id})}"
+                  th:text="${schedule.processName}"
+                ></a>
+                <span
+                  class="badge"
+                  th:classappend="${schedule.status.name() == 'COMPLETED'} ? 'badge-green' : (${schedule.status.name() == 'IN_PROGRESS'} ? 'badge-blue' : (${schedule.status.name() == 'DELAYED'} ? 'badge-red' : 'badge-yellow'))"
+                  th:text="${schedule.status}"
+                ></span>
+              </div>
+              <div class="schedule-meta">
+                工单ID: <span th:text="${schedule.orderId}"></span>
+                <span
+                  th:if="${schedule.remarks}"
+                  th:text="' | ' + ${schedule.remarks}"
+                ></span>
+              </div>
+              <div class="schedule-actions">
+                <form
+                  th:action="@{/schedule/{id}/status(id=${schedule.id})}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <select name="status" onchange="this.form.submit()">
+                    <option
+                      th:each="s : ${statuses}"
+                      th:value="${s}"
+                      th:text="${s}"
+                      th:selected="${s == schedule.status}"
+                    ></option>
+                  </select>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section" style="margin-top: 2rem">
+          <h2>新建排产</h2>
+          <div class="form-card">
+            <form th:action="@{/schedule}" method="post">
+              <div class="form-group">
+                <label>关联工单</label>
+                <select name="orderId" required="required">
+                  <option value="">请选择工单</option>
+                  <option
+                    th:each="wo : ${workOrders}"
+                    th:value="${wo.id}"
+                    th:text="${wo.orderNo + ' - ' + wo.productName}"
+                  ></option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>工序名称</label>
+                <input type="text" name="processName" required="required" />
+              </div>
+              <div class="form-group">
+                <label>开始时间</label>
+                <input
+                  type="datetime-local"
+                  name="startTime"
+                  required="required"
+                />
+              </div>
+              <div class="form-group">
+                <label>结束时间</label>
+                <input
+                  type="datetime-local"
+                  name="endTime"
+                  required="required"
+                />
+              </div>
+              <div class="form-group">
+                <label>备注</label>
+                <input type="text" name="remarks" />
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-success">创建排产</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数据统计 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>🏭 MES</h2>
+        <p>制造执行系统</p>
+      </div>
+      <ul class="nav-menu">
+        <li><a th:href="@{/}">📊 仪表盘</a></li>
+        <li><a th:href="@{/workorders}">📋 工单管理</a></li>
+        <li><a th:href="@{/schedule}">📅 生产排程</a></li>
+        <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+        <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+        <li>
+          <a th:href="@{/dashboard/overview}" class="active">📈 数据统计</a>
+        </li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>📈 数据统计概览</h1>
+        <div class="user-info"><span>👤 admin</span></div>
+      </header>
+      <div class="content">
+        <div class="stats-grid">
+          <div class="stat-card stat-blue">
+            <div class="stat-value" th:text="${passRate} + '%'">0%</div>
+            <div class="stat-label">质检合格率</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📊 工单状态分布</h2>
+          <div class="chart-container">
+            <div class="bar-chart">
+              <div th:each="entry : ${orderStats}" class="bar-item">
+                <div class="bar-label" th:text="${entry.key}"></div>
+                <div class="bar-track">
+                  <div
+                    class="bar-fill"
+                    th:style="'width: ' + ${entry.value * 10} + '%'"
+                  >
+                    <span class="bar-value" th:text="${entry.value}"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>⚙️ 设备状态分布</h2>
+          <div class="chart-container">
+            <div class="bar-chart">
+              <div th:each="entry : ${equipStats}" class="bar-item">
+                <div class="bar-label" th:text="${entry.key}"></div>
+                <div class="bar-track">
+                  <div
+                    class="bar-fill bar-fill-blue"
+                    th:style="'width: ' + ${entry.value * 20} + '%'"
+                  >
+                    <span class="bar-value" th:text="${entry.value}"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📅 排程总览</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>工序</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="s : ${schedules}">
+                <td th:text="${s.processName}"></td>
+                <td
+                  th:text="${#temporals.format(s.startTime, 'yyyy-MM-dd HH:mm')}"
+                ></td>
+                <td
+                  th:text="${#temporals.format(s.endTime, 'yyyy-MM-dd HH:mm')}"
+                ></td>
+                <td>
+                  <span
+                    class="badge"
+                    th:classappend="${s.status.name() == 'COMPLETED'} ? 'badge-green' : (${s.status.name() == 'IN_PROGRESS'} ? 'badge-blue' : 'badge-yellow')"
+                    th:text="${s.status}"
+                  ></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

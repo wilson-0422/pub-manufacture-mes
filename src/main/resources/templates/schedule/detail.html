@@ -1,0 +1,81 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>排程详情 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>🏭 MES</h2>
+        <p>制造执行系统</p>
+      </div>
+      <ul class="nav-menu">
+        <li><a th:href="@{/}">📊 仪表盘</a></li>
+        <li><a th:href="@{/workorders}">📋 工单管理</a></li>
+        <li><a th:href="@{/schedule}" class="active">📅 生产排程</a></li>
+        <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+        <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+        <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>📅 排程详情</h1>
+        <div class="user-info"><span>👤 admin</span></div>
+      </header>
+      <div class="content">
+        <div class="detail-card">
+          <h2 th:text="${schedule.processName}"></h2>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>排产ID</label>
+              <span th:text="${schedule.id}"></span>
+            </div>
+            <div class="detail-item">
+              <label>关联工单ID</label>
+              <span th:text="${schedule.orderId}"></span>
+            </div>
+            <div class="detail-item">
+              <label>状态</label>
+              <span
+                class="badge"
+                th:classappend="${schedule.status.name() == 'COMPLETED'} ? 'badge-green' : (${schedule.status.name() == 'IN_PROGRESS'} ? 'badge-blue' : 'badge-yellow')"
+                th:text="${schedule.status}"
+              ></span>
+            </div>
+            <div class="detail-item">
+              <label>开始时间</label>
+              <span
+                th:text="${#temporals.format(schedule.startTime, 'yyyy-MM-dd HH:mm')}"
+              ></span>
+            </div>
+            <div class="detail-item">
+              <label>结束时间</label>
+              <span
+                th:text="${#temporals.format(schedule.endTime, 'yyyy-MM-dd HH:mm')}"
+              ></span>
+            </div>
+            <div class="detail-item">
+              <label>备注</label>
+              <span
+                th:text="${schedule.remarks != null} ? ${schedule.remarks} : '-'"
+              ></span>
+            </div>
+          </div>
+          <div th:if="${workOrder}" class="section" style="margin-top: 1.5rem">
+            <h3>关联工单</h3>
+            <p>工单号: <span th:text="${workOrder.orderNo}"></span></p>
+            <p>产品: <span th:text="${workOrder.productName}"></span></p>
+            <p>数量: <span th:text="${workOrder.quantity}"></span></p>
+          </div>
+          <div class="action-bar">
+            <a th:href="@{/schedule}" class="btn">返回列表</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

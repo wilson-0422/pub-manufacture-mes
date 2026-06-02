@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>工单详情 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>🏭 MES</h2>
+            <p>制造执行系统</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a th:href="@{/}">📊 仪表盘</a></li>
+            <li><a th:href="@{/workorders}" class="active">📋 工单管理</a></li>
+            <li><a th:href="@{/schedule}">📅 生产排程</a></li>
+            <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+            <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+            <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+        </ul>
+    </nav>
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>📋 工单详情</h1>
+            <div class="user-info"><span>👤 admin</span></div>
+        </header>
+        <div class="content">
+            <div class="detail-card">
+                <h2 th:text="${workOrder.orderNo}"></h2>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>产品名称</label>
+                        <span th:text="${workOrder.productName}"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>数量</label>
+                        <span th:text="${workOrder.quantity}"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>状态</label>
+                        <span class="badge" th:classappend="${workOrder.status.name() == 'COMPLETED'} ? 'badge-green' : (${workOrder.status.name() == 'IN_PROGRESS'} ? 'badge-blue' : 'badge-yellow')" th:text="${workOrder.status}"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>优先级</label>
+                        <span class="badge" th:classappend="${workOrder.priority.name() == 'HIGH' || workOrder.priority.name() == 'URGENT'} ? 'badge-red' : 'badge-yellow'" th:text="${workOrder.priority}"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>负责人</label>
+                        <span th:text="${workOrder.assignedTo}"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>计划开始</label>
+                        <span th:text="${workOrder.plannedStart != null} ? ${#temporals.format(workOrder.plannedStart, 'yyyy-MM-dd HH:mm')} : '-'"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>计划结束</label>
+                        <span th:text="${workOrder.plannedEnd != null} ? ${#temporals.format(workOrder.plannedEnd, 'yyyy-MM-dd HH:mm')} : '-'"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>实际开始</label>
+                        <span th:text="${workOrder.actualStart != null} ? ${#temporals.format(workOrder.actualStart, 'yyyy-MM-dd HH:mm')} : '-'"></span>
+                    </div>
+                    <div class="detail-item">
+                        <label>实际结束</label>
+                        <span th:text="${workOrder.actualEnd != null} ? ${#temporals.format(workOrder.actualEnd, 'yyyy-MM-dd HH:mm')} : '-'"></span>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <a th:href="@{/workorders/{id}/edit(id=${workOrder.id})}" class="btn btn-warning">编辑</a>
+                    <a th:href="@{/workorders}" class="btn">返回列表</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

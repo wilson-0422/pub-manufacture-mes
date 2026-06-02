@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>工单管理 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>🏭 MES</h2>
+            <p>制造执行系统</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a th:href="@{/}">📊 仪表盘</a></li>
+            <li><a th:href="@{/workorders}" class="active">📋 工单管理</a></li>
+            <li><a th:href="@{/schedule}">📅 生产排程</a></li>
+            <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+            <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+            <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+        </ul>
+    </nav>
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>📋 工单管理</h1>
+            <div class="user-info"><span>👤 admin</span></div>
+        </header>
+        <div class="content">
+            <div class="toolbar">
+                <div class="filter-group">
+                    <a th:href="@{/workorders}" class="btn" th:classappend="${currentStatus == null && currentPriority == null} ? 'btn-primary' : ''">全部</a>
+                    <a th:each="s : ${statuses}" th:href="@{/workorders(status=${s})}" class="btn" th:classappend="${currentStatus == s} ? 'btn-primary' : ''" th:text="${s}"></a>
+                </div>
+                <a th:href="@{/workorders/create}" class="btn btn-success">+ 新建工单</a>
+            </div>
+
+            <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>工单号</th>
+                        <th>产品名称</th>
+                        <th>数量</th>
+                        <th>状态</th>
+                        <th>优先级</th>
+                        <th>计划开始</th>
+                        <th>负责人</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="wo : ${workOrders}">
+                        <td th:text="${wo.orderNo}"></td>
+                        <td th:text="${wo.productName}"></td>
+                        <td th:text="${wo.quantity}"></td>
+                        <td><span class="badge" th:classappend="${wo.status.name() == 'COMPLETED'} ? 'badge-green' : (${wo.status.name() == 'IN_PROGRESS'} ? 'badge-blue' : (${wo.status.name() == 'PENDING'} ? 'badge-yellow' : 'badge-red'))" th:text="${wo.status}"></span></td>
+                        <td><span class="badge" th:classappend="${wo.priority.name() == 'HIGH' || wo.priority.name() == 'URGENT'} ? 'badge-red' : (${wo.priority.name() == 'MEDIUM'} ? 'badge-yellow' : 'badge-green')" th:text="${wo.priority}"></span></td>
+                        <td th:text="${wo.plannedStart != null} ? ${#temporals.format(wo.plannedStart, 'yyyy-MM-dd')} : ''"></td>
+                        <td th:text="${wo.assignedTo}"></td>
+                        <td class="action-links">
+                            <a th:href="@{/workorders/{id}(id=${wo.id})}" class="btn btn-sm">查看</a>
+                            <a th:href="@{/workorders/{id}/edit(id=${wo.id})}" class="btn btn-sm btn-warning">编辑</a>
+                            <form th:action="@{/workorders/{id}/delete(id=${wo.id})}" method="post" style="display:inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确认删除此工单？')">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

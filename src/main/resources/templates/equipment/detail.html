@@ -1,0 +1,134 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>设备详情 - MES</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>🏭 MES</h2>
+        <p>制造执行系统</p>
+      </div>
+      <ul class="nav-menu">
+        <li><a th:href="@{/}">📊 仪表盘</a></li>
+        <li><a th:href="@{/workorders}">📋 工单管理</a></li>
+        <li><a th:href="@{/schedule}">📅 生产排程</a></li>
+        <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+        <li><a th:href="@{/equipment}" class="active">⚙️ 设备监控</a></li>
+        <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>⚙️ 设备详情</h1>
+        <div class="user-info"><span>👤 admin</span></div>
+      </header>
+      <div class="content">
+        <div class="detail-card">
+          <h2 th:text="${equipment.name}"></h2>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>设备编码</label>
+              <span th:text="${equipment.code}"></span>
+            </div>
+            <div class="detail-item">
+              <label>当前状态</label>
+              <span
+                class="badge"
+                th:classappend="${equipment.status.name() == 'RUNNING'} ? 'badge-green' : (${equipment.status.name() == 'MAINTENANCE'} ? 'badge-orange' : 'badge-yellow')"
+                th:text="${equipment.status}"
+              ></span>
+            </div>
+            <div class="detail-item">
+              <label>位置</label>
+              <span th:text="${equipment.location}"></span>
+            </div>
+            <div class="detail-item">
+              <label>上次维护</label>
+              <span th:text="${equipment.lastMaintenance}"></span>
+            </div>
+            <div class="detail-item">
+              <label>下次维护</label>
+              <span th:text="${equipment.nextMaintenance}"></span>
+            </div>
+          </div>
+          <div class="action-bar">
+            <form
+              th:action="@{/equipment/{id}/status(id=${equipment.id})}"
+              method="post"
+              style="display: inline"
+            >
+              <select name="status" onchange="this.form.submit()">
+                <option
+                  th:each="s : ${T(com.mes.model.Equipment).Status.values()}"
+                  th:value="${s}"
+                  th:text="${s}"
+                  th:selected="${s == equipment.status}"
+                ></option>
+              </select>
+            </form>
+            <a th:href="@{/equipment}" class="btn">返回列表</a>
+          </div>
+        </div>
+
+        <div class="section" style="margin-top: 2rem">
+          <h3>📝 设备日志</h3>
+          <div class="form-card" style="margin-bottom: 1rem">
+            <form
+              th:action="@{/equipment/{id}/log(id=${equipment.id})}"
+              method="post"
+            >
+              <div class="form-row">
+                <div class="form-group">
+                  <select name="logType">
+                    <option
+                      th:each="lt : ${logTypes}"
+                      th:value="${lt}"
+                      th:text="${lt}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="form-group" style="flex: 1">
+                  <input
+                    type="text"
+                    name="description"
+                    placeholder="输入日志描述..."
+                    required="required"
+                  />
+                </div>
+                <button type="submit" class="btn btn-success">添加日志</button>
+              </div>
+            </form>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>类型</th>
+                <th>描述</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="log : ${logs}">
+                <td
+                  th:text="${#temporals.format(log.recordedAt, 'yyyy-MM-dd HH:mm')}"
+                ></td>
+                <td>
+                  <span
+                    class="badge"
+                    th:classappend="${log.logType.name() == 'FAULT'} ? 'badge-red' : (${log.logType.name() == 'MAINTENANCE'} ? 'badge-orange' : 'badge-blue')"
+                    th:text="${log.logType}"
+                  ></span>
+                </td>
+                <td th:text="${log.description}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

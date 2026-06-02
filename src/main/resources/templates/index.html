@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MES 仪表盘</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>🏭 MES</h2>
+            <p>制造执行系统</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a th:href="@{/}" class="active">📊 仪表盘</a></li>
+            <li><a th:href="@{/workorders}">📋 工单管理</a></li>
+            <li><a th:href="@{/schedule}">📅 生产排程</a></li>
+            <li><a th:href="@{/quality}">✅ 质量检验</a></li>
+            <li><a th:href="@{/equipment}">⚙️ 设备监控</a></li>
+            <li><a th:href="@{/dashboard/overview}">📈 数据统计</a></li>
+        </ul>
+    </nav>
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>📊 生产仪表盘</h1>
+            <div class="user-info"><span>👤 admin</span></div>
+        </header>
+        <div class="content">
+            <div class="stats-grid">
+                <div class="stat-card stat-blue">
+                    <div class="stat-value" th:text="${totalOrders}">0</div>
+                    <div class="stat-label">工单总数</div>
+                </div>
+                <div class="stat-card stat-yellow">
+                    <div class="stat-value" th:text="${pendingOrders}">0</div>
+                    <div class="stat-label">待处理</div>
+                </div>
+                <div class="stat-card stat-orange">
+                    <div class="stat-value" th:text="${inProgressOrders}">0</div>
+                    <div class="stat-label">进行中</div>
+                </div>
+                <div class="stat-card stat-green">
+                    <div class="stat-value" th:text="${completedOrders}">0</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-card stat-blue">
+                    <div class="stat-value" th:text="${runningEquipment} + '/' + ${totalEquipment}">0/0</div>
+                    <div class="stat-label">设备运行</div>
+                </div>
+                <div class="stat-card stat-purple">
+                    <div class="stat-value" th:text="${passRate} + '%'">0%</div>
+                    <div class="stat-label">质检合格率</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 最新工单</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>产品名称</th>
+                            <th>数量</th>
+                            <th>状态</th>
+                            <th>优先级</th>
+                            <th>负责人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${recentOrders}">
+                            <td th:text="${order.orderNo}"></td>
+                            <td th:text="${order.productName}"></td>
+                            <td th:text="${order.quantity}"></td>
+                            <td><span class="badge" th:classappend="${order.status.name() == 'COMPLETED'} ? 'badge-green' : (${order.status.name() == 'IN_PROGRESS'} ? 'badge-blue' : (${order.status.name() == 'PENDING'} ? 'badge-yellow' : 'badge-red'))" th:text="${order.status}"></span></td>
+                            <td><span class="badge" th:classappend="${order.priority.name() == 'HIGH' || order.priority.name() == 'URGENT'} ? 'badge-red' : (${order.priority.name() == 'MEDIUM'} ? 'badge-yellow' : 'badge-green')" th:text="${order.priority}"></span></td>
+                            <td th:text="${order.assignedTo}"></td>
+                            <td><a th:href="@{/workorders/{id}(id=${order.id})}" class="btn btn-sm">查看</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
